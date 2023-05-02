@@ -1,6 +1,9 @@
 'use strict';
 
+
+
 const e = React.createElement;
+
 
 class Summary extends React.Component {
   constructor(props) {
@@ -42,23 +45,67 @@ const Instructions = (props) => e('section', { className: 'instructions' },
   props.instructions.map((text, i) => e('p', { key: i }, text))
 );
 
+
 class Recipe extends React.Component {
 
   render() {
-    return e(
-      'section',
-      { id: this.props.id },
-      e(Summary, {
-        name: this.props.name, ingredients: this.props.items.length, steps:
-          this.props.instructions.length
-      }),
-      e(IngredientsList, { items: this.props.items }),
-      e(Instructions, { instructions: this.props.instructions }),
+    return e('section', { id: this.props.id },
+      e(Summary, { recipeName: this.props.recipeName, ingredientCount: this.props.ingredientList.length, stepCount: this.props.instructionList.length }),
+      e(IngredientsList, { items: this.props.ingredientList }),
+      e(Instructions, { instructions: this.props.instructionList }),
       e(StarRating)
-    );
+    )
   }
 }
 
+const Star = (props) => ({ selected = false, onClick = f => f }) =>
+  e('span',
+    { className: selected ? 'star selected' : 'star', onClick: onClick });
+
+Star.propTypes = {
+  selected: PropTypes.bool,
+  onClick: PropTypes.func
+};
+
+
+class StarRating extends React.Component {
+  
+  constructor(props) {
+    super(props);
+    this.state = {
+      starsSelected: props.starsSelected || 0,
+      currentTime: new Date().toLocaleString()
+    };
+    this.change = this.change.bind(this);
+  }
+  change(starsSelected) {
+    this.setState({ starsSelected, currentTime: new Date().toLocaleString() });
+  }
+  
+  static propTypes = {
+    totalStars: PropTypes.number,
+  };
+  static defaultProps = {
+    totalStars: 5,
+  };
+  
+  render() {
+    const { totalStars } = this.props;
+    const { starsSelected } = this.state;
+    console.log(this.state.currentTime);
+    
+    
+  return e('div',
+    { className: 'star-rating' },
+    [...Array(totalStars)].map((n, i) => e(Star, {
+      key: i, selected: i < starsSelected,
+      onClick: () => this.change(i + 1),
+    })),
+    e('p', null, starsSelected + ' of ' + totalStars + ' stars'),
+  );
+  }
+
+}
 
 let items = [
   "1 lb Salmon",
@@ -82,56 +129,10 @@ let id = 'baked-salmon';
 
 let recipeName = 'Baked Salmon';
 
-const Star = ({ selected = false, onClick = f => f }) =>
-  e('span',
-    { className: selected ? 'star selected' : 'star', onClick: onClick });
-Star.propTypes = {
-  selected: PropTypes.bool,
-  onClick: PropTypes.func,
-};
-
-class StarRating extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      starsSelected: props.starsSelected || 0,
-      currentTime: new Date().toLocaleString()
-    };
-    this.change = this.change.bind(this);
-  }
-  change(starsSelected) {
-    this.setState({ starsSelected, currentTime: new Date().toLocaleString() });
-  }
-
-  static propTypes = {
-    totalStars: PropTypes.number,
-  };
-  static defaultProps = {
-    totalStars: 5,
-  };
-
-
-
-  render() {
-    const { totalStars } = this.props;
-    const { starsSelected } = this.state;
-    console.log(this.state.currentTime);
-    return e('div',
-      { className: 'star-rating' },
-      [...Array(totalStars)].map((n, i) => e(Star, {
-        key: i, selected: i < starsSelected,
-        onClick: () => this.change(i + 1)
-      })),
-      e('p', null, starsSelected + ' of ' + totalStars + ' stars'),
-    );
-  }
-}
-
-
-
-ReactDOM.render(e(Recipe, {
-  items: items,
-  instructions: instructions,
-  id: id,
-  name: recipeName
-}), document.getElementById('react-container'));
+ReactDOM.render(e(Recipe,
+  {
+    ingredientList: items,
+    instructionList: instructions,
+    id: id, recipeName: recipeName,starsSelected: 0,
+  }),
+  document.getElementById('react-container'));
