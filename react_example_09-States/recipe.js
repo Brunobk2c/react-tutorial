@@ -58,7 +58,7 @@ class Recipe extends React.Component {
   }
 }
 
-const Star = (props) => ({ selected = false, onClick = f => f }) =>
+const Star  = ({ selected = false, onClick = f => f }) =>
   e('span',
     { className: selected ? 'star selected' : 'star', onClick: onClick });
 
@@ -82,12 +82,6 @@ class StarRating extends React.Component {
     this.setState({ starsSelected, currentTime: new Date().toLocaleString() });
   }
   
-  static propTypes = {
-    totalStars: PropTypes.number,
-  };
-  static defaultProps = {
-    totalStars: 5,
-  };
   
   render() {
     const { totalStars } = this.props;
@@ -95,17 +89,25 @@ class StarRating extends React.Component {
     console.log(this.state.currentTime);
     
     
-  return e('div',
+    return e('div',
     { className: 'star-rating' },
     [...Array(totalStars)].map((n, i) => e(Star, {
       key: i, selected: i < starsSelected,
       onClick: () => this.change(i + 1),
     })),
     e('p', null, starsSelected + ' of ' + totalStars + ' stars'),
-  );
+    );
   }
-
+  
+  static propTypes = {
+    totalStars: PropTypes.number,
+  };
+  static defaultProps = {
+    totalStars: 5,
+  };
 }
+
+
 
 let items = [
   "1 lb Salmon",
@@ -133,6 +135,6 @@ ReactDOM.render(e(Recipe,
   {
     ingredientList: items,
     instructionList: instructions,
-    id: id, recipeName: recipeName,starsSelected: 0,
+    id: id, recipeName: recipeName
   }),
   document.getElementById('react-container'));
